@@ -1,0 +1,7 @@
+libs/libtorch_rel/
+libs/libtorch_deb/
+pycuda/
+
+.vs/
+x64/
+x86/

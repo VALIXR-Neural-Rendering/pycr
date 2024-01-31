@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pycr", "pycr.vcxproj", "{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "render_app", "..\render_app\render_app.pyproj", "{4F8DC15B-257F-4FA6-B176-7D6DAC4BBD91}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Debug|Any CPU.Build.0 = Debug|x64
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Debug|x64.ActiveCfg = Debug|x64
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Debug|x64.Build.0 = Debug|x64
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Debug|x86.ActiveCfg = Debug|Win32
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Debug|x86.Build.0 = Debug|Win32
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Release|Any CPU.ActiveCfg = Release|x64
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Release|Any CPU.Build.0 = Release|x64
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Release|x64.ActiveCfg = Release|x64
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Release|x64.Build.0 = Release|x64
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Release|x86.ActiveCfg = Release|Win32
+		{5F0E005D-F8C8-43BF-93F5-3FE7E67BCEE6}.Release|x86.Build.0 = Release|Win32
+		{4F8DC15B-257F-4FA6-B176-7D6DAC4BBD91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F8DC15B-257F-4FA6-B176-7D6DAC4BBD91}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4F8DC15B-257F-4FA6-B176-7D6DAC4BBD91}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4F8DC15B-257F-4FA6-B176-7D6DAC4BBD91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F8DC15B-257F-4FA6-B176-7D6DAC4BBD91}.Release|x64.ActiveCfg = Release|Any CPU
+		{4F8DC15B-257F-4FA6-B176-7D6DAC4BBD91}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A8CAA5FD-E31B-4265-881E-1C6446E0146B}
+	EndGlobalSection
+EndGlobal
