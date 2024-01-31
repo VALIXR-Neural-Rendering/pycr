@@ -210,7 +210,8 @@ class MyApp():
         tview = view_matrix.T
         self.render_view['view'] = tview
         self.compute_loop.render(self.render_view)
-        frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float32)
+        # frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float32)
+        frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float64)
         frame = frame.reshape(H, W, 4) / 255.0
         # frame = self.compute_loop.outFramePixels
 

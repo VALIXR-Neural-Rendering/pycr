@@ -37,7 +37,8 @@ cd ..
 ## Running the software
 
 1. Open `pycr` -> `pycr.sln` in Visual Studio (tested on VS2022)
-2. Run the solution (in Release-x64 mode)
+2. Build the `pycr` project in the solution (in Release-x64 mode)
+3. Run the solution
 
 ## Documentation of `pycr`
 
