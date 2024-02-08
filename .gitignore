@@ -1,6 +1,7 @@
 libs/libtorch_rel/
 libs/libtorch_deb/
 pycuda/
+render_app/data/screenshots/
 
 .vs/
 x64/

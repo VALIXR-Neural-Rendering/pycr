@@ -30,7 +30,8 @@ import pdb
 def get_args():
     parser = argparse.ArgumentParser(description='')
     # parser.add_argument('--inpf', type=str, default="C:/UMD/render_pc/data/nasa/h_common.nc4", help='LAS/NC4 file path')
-    parser.add_argument('--inpf', type=str, default="C:/UMD/render_pc/data/nasa/h_common.las", help='LAS/NC4 file path')
+    parser.add_argument('--inpf', type=str, default="C:/UMD/render_pc/data/nasa/hurricane_hd.las", help='LAS/NC4 file path')
+    parser.add_argument('--viewf', type=str, default="C:/UMD/render_pc/data/nasa/hurricane/view_.txt", help='View matrices file path')
     
     parser.add_argument('--viewport', type=str, default='1820,980', help='width,height') # '3200,2000' for server screen
     parser.add_argument('--rmode', choices=['trackball', 'fly'], default='trackball')
@@ -109,16 +110,18 @@ class MyApp():
         #    [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
         #      1.00000000e+00]
         # ])
-        init_view = np.array([
-           [ 9.64632000e-01, -2.63601000e-01,  5.30000000e-05,
-        -9.10121620e+01],
-           [-2.60912000e-01, -9.54764000e-01,  1.42659000e-01,
-             8.94545460e+02],
-           [ 3.75550000e-02,  1.37627000e-01,  9.89772000e-01,
-            -1.46066213e+05],
-           [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-             1.00000000e+00]
-        ])
+        # init_view = np.array([
+        #    [ 9.64632000e-01, -2.63601000e-01,  5.30000000e-05,
+        # -9.10121620e+01],
+        #    [-2.60912000e-01, -9.54764000e-01,  1.42659000e-01,
+        #      8.94545460e+02],
+        #    [ 3.75550000e-02,  1.37627000e-01,  9.89772000e-01,
+        #     -1.46066213e+05],
+        #    [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        #      1.00000000e+00]
+        # ])
+        vmats = np.loadtxt(args.viewf).reshape(-1, 4, 4)
+        init_view = vmats[2061]
 
         init_proj = np.array([
             [0.932642758, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000],
@@ -142,7 +145,7 @@ class MyApp():
             import pycuda.gl.autoinit  # this may fails in headless mode
         except:
             raise RuntimeError('PyCUDA init failed, cannot use torch buffer')
-        _ = torch.rand((1, 3, 512,512), dtype=torch.float32, device='cuda') # needs init here, otherwise does not work
+        _ = torch.rand((1, 3, 512,512), dtype=torch.float64, device='cuda') # needs init here, otherwise does not work
 
         screen_tex, self.screen_tex_cuda = create_shared_texture(
             np.zeros((self.viewport_size[1], self.viewport_size[0],4), np.float32))
@@ -210,9 +213,10 @@ class MyApp():
         tview = view_matrix.T
         self.render_view['view'] = tview
         self.compute_loop.render(self.render_view)
-        # frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float32)
-        frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float64)
+        frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float32)
         frame = frame.reshape(H, W, 4) / 255.0
+        frame[:,:,3] = 1.0
+        # pdb.set_trace()
         # frame = self.compute_loop.outFramePixels
 
         # if len(frame) > 0:
@@ -226,6 +230,7 @@ class MyApp():
     def save_screen(self, out_dir='./data/screenshots'):
         os.makedirs(out_dir, exist_ok=True)
         img = cv2.flip(self.last_frame[:,:,:3].detach().cpu().numpy(), 0)*255
+        img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imwrite(os.path.join(out_dir, str(self.n_save_frame) + '.png'), img)
         self.n_save_frame += 1
@@ -269,7 +274,6 @@ class MyApp():
         
         # Copy the frame to screen texture
         if len(self.last_frame) > 0:
-            # pdb.set_trace()
             cpy_tensor_to_texture(self.last_frame.detach().clone(), self.screen_tex_cuda)
 
         self.window.clear()
