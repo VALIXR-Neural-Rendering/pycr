@@ -63,10 +63,6 @@ shared_ptr<LoadResult> loadNC(shared_ptr<NCFile> ncfile, int64_t firstPoint, int
 	if ((retval = nc_open(ncfile->path.c_str(), NC_NOWRITE, &ncid))) ERR(retval);
 	if ((retval = nc_inq(ncid, &ndims, &nvars, NULL, &unlimdimid))) ERR(retval);
 
-	//cout << "ndims: " << ndims << endl;
-	//cout << "nvars: " << nvars << endl;
-	//cout << "unlimdimid: " << unlimdimid << endl;
-
 	auto posBuffer = readVariable(ncid, "Position", firstPoint, numPoints);
 	auto colorBuffer = readVariable(ncid, "color", firstPoint, numPoints);
 	auto velBuffer = readVariable(ncid, "vel", firstPoint, numPoints);
@@ -227,32 +223,10 @@ shared_ptr<LoadResult> loadNC(shared_ptr<NCFile> ncfile, int64_t firstPoint, int
 				float vy = velBuffer->get<float>(index_pointFile * ncfile->bytesPerPoint + 4);
 				float vz = velBuffer->get<float>(index_pointFile * ncfile->bytesPerPoint + 8);
 
-				//if (i == 0) {
-				//	cout << "vx: " << vx << endl;
-				//	cout << "vy: " << vy << endl;
-				//	cout << "vz: " << vz << endl;
-				//}
-
 				float vel = sqrt((vx * vx) + (vy * vy) + (vz * vz));
 				vx /= vel;
 				vy /= vel;
 				vz /= vel;
-
-				//uint32_t velEnc = packFvec2UI(vx, vy, vz);
-				//float dec_a, dec_b, dec_c;
-				//unpackUI2Fvec(velEnc, dec_a, dec_b, dec_c);
-
-				//if (i == 0) {
-				//	cout << "vx_new: " << vx << endl;
-				//	cout << "vy_new: " << vy << endl;
-				//	cout << "vz_new: " << vz << endl;
-				//	cout << "vel: " << vel << endl;
-				//	cout << "velEnc: " << velEnc << endl;
-				//	cout << "dec_a: " << dec_a << endl;
-				//	cout << "dec_b: " << dec_b << endl;
-				//	cout << "dec_c: " << dec_c << endl;
-				//	cout << endl;
-				//}
 
 				bVel->set<float>(vx, ncfile->bytesPerPoint * index_pointFile + 0);
 				bVel->set<float>(vy, ncfile->bytesPerPoint * index_pointFile + 4);
@@ -432,18 +406,4 @@ void NCLoaderSparse::addFile(string ncfname)
 
 	boxMin = glm::min(boxMin, ncfile->boxMin);
 	boxMax = glm::max(boxMax, ncfile->boxMax);
-
-
-
-
-
-	// zoom to point cloud
-	/*auto size = boxMax - boxMin;
-	auto position = (boxMax + boxMin) / 2.0;
-	auto radius = glm::length(size) / 1.5;
-
-	renderer->controls->yaw = 0.53;
-	renderer->controls->pitch = -0.68;
-	renderer->controls->radius = radius;
-	renderer->controls->target = position;*/
 }

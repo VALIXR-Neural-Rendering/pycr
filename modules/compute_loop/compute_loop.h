@@ -197,12 +197,6 @@ struct ComputeLoop : public Method{
 		py::array_t<float> rview_proj = py::cast<py::array_t<float>>(rview["proj"]);
 		auto proj_mat = cast2mat4(rview_proj);
 
-		/*las->process();
-
-		if (las->numPointsLoaded == 0) {
-			return;
-		}*/
-
 		auto fbo = py::cast<shared_ptr<Framebuffer>>(rview["framebuffer"]);
 
 		// REGISTER TEXTURE ON GPU
@@ -231,10 +225,6 @@ struct ComputeLoop : public Method{
 			mat4 proj = proj_mat;
 			mat4 worldView = view * world;
 			mat4 worldViewProj = proj * view * world;
-
-			//cout << "view: " << glm::to_string(view) << std::endl;
-			//cout << "proj: " << glm::to_string(proj) << std::endl;
-			//cout << "world: " << glm::to_string(worldViewProj) << std::endl;
 
 			uniformData.world = world;
 			uniformData.view = view;
@@ -318,7 +308,6 @@ struct ComputeLoop : public Method{
 
 			glBindImageTexture(0, fbo->colorAttachments[0]->handle, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI);
 
-			// int numBatches = ceil(double(las->numPointsLoaded) / double(POINTS_PER_WORKGROUP));
 			int numBatches = las->numBatchesLoaded;
 
 			glDispatchCompute(numBatches, 1, 1);
@@ -376,9 +365,6 @@ struct ComputeLoop : public Method{
 
 		{ // CLEAR
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-			// Save the current viewport
-			//saveFrame(fbo);
 
 			GLuint zero = 0;
 			float inf = -Infinity;

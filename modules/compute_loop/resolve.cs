@@ -71,32 +71,6 @@ void main(){
 
 	ivec2 imgSize = uniforms.imageSize;
 
-	// { // 1 pixel
-	// 	ivec2 pixelCoords = ivec2(id);
-	// 	ivec2 sourceCoords = ivec2(id);
-	// 	int pixelID = sourceCoords.x + sourceCoords.y * uniforms.imageSize.x;
-
-	// 	uint64_t data = ssFramebuffer[pixelID];
-	// 	uint32_t pointID = uint32_t(data & 0xFFFFFFFFul);
-	// 	bool isLodPoint = ((data & 0x80000000ul) != 0);
-	// 	bool isBackground = (data & 0xFFFFFFFFul) > 0xfffffff0u;
-		
-	// 	uint color;
-	// 	if(isLodPoint){
-	// 		color = lodColor.data[pointID];
-	// 		// color = 0x0000ffFF;
-	// 	}else{
-	// 		// color = ssRGBA[pointID];
-	// 		color = pointID;
-	// 	}
-
-	// 	if(isBackground){
-	// 		color = 0x000000FF;
-	// 	}
-
-	// 	imageAtomicExchange(uOutput, pixelCoords, color);
-	// }
-
 	{ // n x n pixel
 		ivec2 pixelCoords = ivec2(id);
 
@@ -138,13 +112,6 @@ void main(){
 		if(uniforms.colorizeChunks){
 			color = closestPointID;
 		}else{
-			//if (alpha > 0.0) {
-				//uint32_t R = uint32_t((alpha) * float(ssRGBA[closestPointID] & 0xff));
-				//uint32_t G = uint32_t((alpha) * float((ssRGBA[closestPointID] >> 8) & 0xff));
-				//uint32_t B = uint32_t((alpha) * float((ssRGBA[closestPointID] >> 16) & 0xff));
-
-				//color = R | (G << 8) | (B << 16);
-			//} else
 			color = ssRGBA[closestPointID];
 		}
 
@@ -158,22 +125,6 @@ void main(){
 				atomicAdd(debug.numPointsVisible, 1);
 			}
 		}
-
-		//if (pixelCoords.x >= 500 && pixelCoords.x < 550 && pixelCoords.y >= 500 && pixelCoords.y < 550)
-		//{
-		//	if (debug.value == 1)
-		//		color = 0x00ff0000;
-		//	else if (debug.value == 2)
-		//		color = 0x0000ff00;
-		//	else if (debug.value == 3)
-		//		color = 0x000000ff;
-		//	else if (debug.value == 4)
-		//		color = 0x00ffff00;
-		//	else if (debug.value == 5)
-		//		color = 0x00ff00ff;
-		//	else if (debug.value == 0)
-		//		color = 0x00ffffff;
-		//}
 
 		if (false)
 		{ // EDL

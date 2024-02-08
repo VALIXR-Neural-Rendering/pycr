@@ -14,8 +14,6 @@ shared_ptr<Texture> Texture::create(int width, int height, GLuint colorType){
 
 	texture->setSize(width, height);
 
-	//glTextureSubImage2D(handle, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
 	return texture;
 }
 

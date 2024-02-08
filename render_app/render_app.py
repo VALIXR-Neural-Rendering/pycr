@@ -30,7 +30,7 @@ import pdb
 def get_args():
     parser = argparse.ArgumentParser(description='')
     # parser.add_argument('--inpf', type=str, default="C:/UMD/render_pc/data/nasa/h_common.nc4", help='LAS/NC4 file path')
-    parser.add_argument('--inpf', type=str, default="C:/UMD/render_pc/data/nasa/h_common.las", help='LAS/NC4 file path')
+    parser.add_argument('--inpf', type=str, default="C:/UMD/render_pc/data/nasa/hurricane_hd.las", help='LAS/NC4 file path')
     
     parser.add_argument('--viewport', type=str, default='1820,980', help='width,height') # '3200,2000' for server screen
     parser.add_argument('--rmode', choices=['trackball', 'fly'], default='trackball')
@@ -93,22 +93,7 @@ class MyApp():
     def __init__(self, args):
         self.viewport_size = fix_viewport_size(args.viewport)
         print('new viewport size ', self.viewport_size)
-        # init_view = np.array([
-        #    [ 8.62807071e-01,  5.05533341e-01, -2.77555756e-17, -2.57929042e+06],
-        #    [-3.17875838e-01,  5.42527067e-01,  7.77572719e-01, -1.90406315e+06],
-        #    [ 3.93088935e-01, -6.70895240e-01,  6.28793024e-01, 2.35217135e+06],
-        #    [ 0.00000000e+00,  0.00000000e+00, -0.00000000e+00, 1.00000000e+00]
-        # ])
-        # init_view = np.array([
-        #    [-9.35260000e-01, -3.53962000e-01,  7.10000000e-05,
-        #  1.22839495e+03],
-        #    [-3.24263000e-01,  8.56869000e-01,  4.00786000e-01,
-        #     -4.35970380e+03],
-        #    [ 1.41923000e-01, -3.74816000e-01,  9.16172000e-01,
-        #     -1.44628014e+05],
-        #    [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-        #      1.00000000e+00]
-        # ])
+
         init_view = np.array([
            [ 9.64632000e-01, -2.63601000e-01,  5.30000000e-05,
         -9.10121620e+01],
@@ -119,15 +104,12 @@ class MyApp():
            [ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
              1.00000000e+00]
         ])
-
         init_proj = np.array([
             [0.932642758, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000],
             [0.0000000000000000, 1.7320508075688774, 0.0000000000000000, 0.0000000000000000],
             [0.0000000000000000, 0.0000000000000000, -1.0000010000005000, -1.0000000000000000],
             [0.0000000000000000, 0.0000000000000000, -0.20000010000005000, 0.0000000000000000]
         ])
-        # init_view = np.eye(4)
-        #self.trackball = Trackball(init_view, self.viewport_size, 1, rotation_mode=args.rmode)
         self.trackball = Trackball(init_view, self.viewport_size, 1, target=[576.91, 886.62, 10.35], rotation_mode=args.rmode)
 
         # this also creates GL context necessary for setting up shaders
@@ -150,7 +132,6 @@ class MyApp():
         self.screen_program = get_screen_program(screen_tex)
 
         # Initialize compute loop
-        
         if args.inpf.endswith("nc4"):
             self.floader = NCLoader(args.inpf)
             self.compute_loop = ComputeLoopNC(self.floader)
@@ -210,22 +191,17 @@ class MyApp():
         tview = view_matrix.T
         self.render_view['view'] = tview
         self.compute_loop.render(self.render_view)
-        # frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float32)
-        frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float64)
+        frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float32)
         frame = frame.reshape(H, W, 4) / 255.0
-        # frame = self.compute_loop.outFramePixels
-
-        # if len(frame) > 0:
-        #     frame = np.array(frame,np.float32).reshape(H, W, 4) / 255.0
-        #     frame += np.tile(np.array([0, 0, 0, 1]), (H, W, 1))
-        #     frame = cv2.flip(frame, 1)
-            #print('frame:', frame.shape)
+        frame[:,:,3] = 1.0
+        # pdb.set_trace()
         
         return frame
 
     def save_screen(self, out_dir='./data/screenshots'):
         os.makedirs(out_dir, exist_ok=True)
         img = cv2.flip(self.last_frame[:,:,:3].detach().cpu().numpy(), 0)*255
+        img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imwrite(os.path.join(out_dir, str(self.n_save_frame) + '.png'), img)
         self.n_save_frame += 1
@@ -269,7 +245,6 @@ class MyApp():
         
         # Copy the frame to screen texture
         if len(self.last_frame) > 0:
-            # pdb.set_trace()
             cpy_tensor_to_texture(self.last_frame.detach().clone(), self.screen_tex_cuda)
 
         self.window.clear()
@@ -287,10 +262,6 @@ class MyApp():
         self.trackball.resize((w, h))
         self.screen_program['position'] = [(0, 0), (0, h), (w, 0), (w, h)]
         self.viewport_size = (w, h)
-        #texture, self.screen_tex_cuda = create_shared_texture(
-        #    np.zeros((self.viewport_size[1], self.viewport_size[0],4),np.float32))
-        #self.screen_program = get_screen_program(texture)
-        #self.render_view['framebuffer'].setSize(w, h)
 
     def on_close(self):
         pass

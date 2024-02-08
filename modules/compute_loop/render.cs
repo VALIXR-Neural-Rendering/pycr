@@ -447,13 +447,6 @@ void main(){
 				}
 
 			}
-
-			//if (pixelCoords.x >= 500 && pixelCoords.x < 550 && pixelCoords.y >= 500 && pixelCoords.y < 550){
-			//	// Added hard coded white for debugging
-			//	uint64_t newColor = 0x00ffffff;
-			//	uint64_t newData = (uint64_t(depth) << 32UL) | newColor;
-   //             atomicExchange(ssFramebuffer[pixelID], newData);
-   //         }
 		}
 
 	}

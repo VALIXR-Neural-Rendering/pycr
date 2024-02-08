@@ -331,8 +331,6 @@ void LasLoaderSparse::addFile(string lfname)
 				int64_t pageAlignedSize = size - (size % PAGE_SIZE) + PAGE_SIZE;
 				pageAlignedSize = std::min(pageAlignedSize, 4 * MAX_POINTS);
 
-				//cout << "commiting, offset: " << formatNumber(pageAlignedOffset) << ", size: " << formatNumber(pageAlignedSize) << endl;
-
 				for (auto glBuffer : { ssXyzLow, ssXyzMed, ssXyzHig, ssColors }) {
 					glBindBuffer(GL_SHADER_STORAGE_BUFFER, glBuffer.handle);
 					glBufferPageCommitmentARB(GL_SHADER_STORAGE_BUFFER, pageAlignedOffset, pageAlignedSize, GL_TRUE);
@@ -340,15 +338,11 @@ void LasLoaderSparse::addFile(string lfname)
 				}
 			}
 
-			//static int64_t numBatchesLoaded = 0;
-
 			// upload batch metadata
 			glNamedBufferSubData(ssBatches.handle,
 				64 * this->numBatchesLoaded,
 				uploadTask.bBatches->size,
 				uploadTask.bBatches->data);
-
-			//numBatchesLoaded += uploadTask.numBatches;
 
 			// upload batch points
 			glNamedBufferSubData(ssXyzLow.handle, 4 * uploadTask.sparse_pointOffset, 4 * uploadTask.numPoints, uploadTask.bXyzLow->data);
@@ -356,13 +350,9 @@ void LasLoaderSparse::addFile(string lfname)
 			glNamedBufferSubData(ssXyzHig.handle, 4 * uploadTask.sparse_pointOffset, 4 * uploadTask.numPoints, uploadTask.bXyzHig->data);
 			glNamedBufferSubData(ssColors.handle, 4 * uploadTask.sparse_pointOffset, 4 * uploadTask.numPoints, uploadTask.bColors->data);
 
-			//cout << "uploading, offset: " << formatNumber(4 * uploadTask.sparse_pointOffset) << ", size: " << formatNumber(4 * uploadTask.numPoints) << endl;
-
 			this->numBatchesLoaded += uploadTask.numBatches;
 			this->numPointsLoaded += uploadTask.numPoints;
 			uploadTask.file->numPointsLoaded += uploadTask.numPoints;
-
-			//cout << "numBatchesLoaded: " << numBatchesLoaded << endl;
 		}
 	}
 
@@ -371,14 +361,4 @@ void LasLoaderSparse::addFile(string lfname)
 
 	boxMin = glm::min(boxMin, lasfile->boxMin);
 	boxMax = glm::max(boxMax, lasfile->boxMax);
-
-	// zoom to point cloud
-	/*auto size = boxMax - boxMin;
-	auto position = (boxMax + boxMin) / 2.0;
-	auto radius = glm::length(size) / 1.5;
-
-	renderer->controls->yaw = 0.53;
-	renderer->controls->pitch = -0.68;
-	renderer->controls->radius = radius;
-	renderer->controls->target = position;*/
 }

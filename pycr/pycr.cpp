@@ -29,12 +29,3 @@ PYBIND11_MODULE(pycr, m) {
 	export_fb(globj);
 	export_texture(globj);
 }
-
-
-/*
-TODO:
-
-compute_loop:
-LasLoaderSparse:
-	1. implement zoom to point cloud
-*/

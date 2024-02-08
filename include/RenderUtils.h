@@ -20,46 +20,6 @@ inline void error_callback(int error, const char* description) {
 }
 
 inline void initGL() {
-
-	//if (wglGetCurrentContext() == NULL){
-	//	cout << "no context" << endl;
-	//}
-
-	//glfwSetErrorCallback(error_callback);
-	//if (!glfwInit()) {
-	//	// Initialization failed
-	//}
-	
-	//window = glfwGetCurrentContext();
-
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	//glfwWindowHint(GLFW_DECORATED, true);
-	//glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-
-	//int numMonitors;
-	//GLFWmonitor** monitors = glfwGetMonitors(&numMonitors);
-
-	//cout << "<create windows>" << endl;
-	//{
-	//	//const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
-	//	window = glfwCreateWindow(width, height, "", nullptr, nullptr);
-
-
-	//	if (!window) {
-	//		int code = glfwGetError(nullptr);
-	//		cout << "glfw error: " << code << endl;
-	//		glfwTerminate();
-	//		exit(EXIT_FAILURE);
-	//	}
-
-	//	glfwSetWindowPos(window, 50, 50);
-	//}
-
-	//glfwMakeContextCurrent(window);
-	//glfwSwapInterval(0);
-
 	GLenum err = glewInit();
 	if (GLEW_OK != err) {
 		/* Problem: glewInit failed, something is seriously wrong. */
@@ -113,11 +73,6 @@ inline shared_ptr<Buffer> readBuffer(GLBuffer glBuffer, uint32_t offset, uint32_
 
 	return target;
 }
-
-//inline int64_t getAvailableGpuMemory(){
-//	GLint available = 0;
-//	glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &available);
-//}
 
 inline shared_ptr<Texture> createTexture(int width, int height, GLuint colorType) {
 
