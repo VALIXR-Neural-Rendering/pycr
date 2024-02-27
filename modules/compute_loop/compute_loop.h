@@ -380,6 +380,4 @@ struct ComputeLoop : public Method{
 
 		GLTimerQueries::timestamp("compute-loop-end");
 	}
-
-
 };

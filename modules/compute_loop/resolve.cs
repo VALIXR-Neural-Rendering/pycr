@@ -63,7 +63,7 @@ float getDepthAt(ivec2 pixelCoords, int window){
 	return closestDepth;
 }
 
-void main(){
+void main() {
 
 	uvec2 id = gl_LocalInvocationID.xy;
 	id.x += gl_WorkGroupSize.x * gl_WorkGroupID.x;
@@ -87,41 +87,41 @@ void main(){
 		uint32_t closestPointID = 0;
 		uint32_t pointID;
 
-        for (int ox = -window; ox <= window; ox++){
-		for(int oy = -window; oy <= window; oy++){
+		for (int ox = -window; ox <= window; ox++) {
+			for (int oy = -window; oy <= window; oy++) {
 
-			int pixelID = (pixelCoords.x + ox) + (pixelCoords.y + oy) * imgSize.x;
+				int pixelID = (pixelCoords.x + ox) + (pixelCoords.y + oy) * imgSize.x;
 
-			uint64_t data = ssFramebuffer[pixelID];
-			uint32_t uDepth = uint32_t(data >> 32l);
-			float depth = uintBitsToFloat(uDepth);
-			
-			pointID = uint32_t(data & 0xffffffffl);
-			uint32_t col = ssRGBA[pointID];
-            alpha = float((col >> 24) & 0xff) / float(255);
+				uint64_t data = ssFramebuffer[pixelID];
+				uint32_t uDepth = uint32_t(data >> 32l);
+				float depth = uintBitsToFloat(uDepth);
 
-			if(depth > 0.0 && depth < closestDepth){
-				closestDepth = depth;
-				closestPointID = pointID;
-            }
-        }
+				pointID = uint32_t(data & 0xffffffffl);
+				uint32_t col = ssRGBA[pointID];
+				alpha = float((col >> 24) & 0xff) / float(255);
+
+				if (depth > 0.0 && depth < closestDepth) {
+					closestDepth = depth;
+					closestPointID = pointID;
+				}
+			}
 		}
 
 		uint32_t color = 0;
-		
-		if(uniforms.colorizeChunks){
+
+		if (uniforms.colorizeChunks) {
 			color = closestPointID;
-		}else{
+		} else {
 			color = ssRGBA[closestPointID];
 		}
 
-		if(closestPointID == 0){
+		if (closestPointID == 0) {
 			//color = 0x00443322;
 			color = 0;
 		}
 		else
 		{
-			if(debug.enabled){
+			if (debug.enabled) {
 				atomicAdd(debug.numPointsVisible, 1);
 			}
 		}
@@ -136,32 +136,26 @@ void main(){
 			float depth = uintBitsToFloat(uDepth);
 
 			float sum = 0.0;
-			for(int ox = -edlWindow; ox <= edlWindow; ox++){
-			for(int oy = -edlWindow; oy <= edlWindow; oy++){
+			for (int ox = -edlWindow; ox <= edlWindow; ox++) {
+				for (int oy = -edlWindow; oy <= edlWindow; oy++) {
 
-				int pixelID = (pixelCoords.x + ox) + (pixelCoords.y + oy) * imgSize.x;
+					int pixelID = (pixelCoords.x + ox) + (pixelCoords.y + oy) * imgSize.x;
+					float neighbourDepth = getDepthAt(pixelCoords + ivec2(ox, oy), window);
 
-				// uint64_t data = ssFramebuffer[pixelID];
-				// uint32_t uDepth = uint32_t(data >> 32l);
-				// uint32_t pointID = uint32_t(data & 0xffffffffl);
-				// float neighbourDepth = uintBitsToFloat(uDepth);
-				float neighbourDepth = getDepthAt(pixelCoords + ivec2(ox, oy), window);
+					sum += max(0.0, depth - neighbourDepth);
 
-				sum += max(0.0, depth - neighbourDepth);
 
-				
-			}
+				}
 			}
 
 			float edlStrength = 0.0005;
 			float response = sum / 9.0;
 			float shade = exp(-response * 300.0 * edlStrength);
-			// shade = 1.0;
 
-			uint R = ((color >>  0) & 0xFF);
-			uint G = ((color >>  8) & 0xFF);
+			uint R = ((color >> 0) & 0xFF);
+			uint G = ((color >> 8) & 0xFF);
 			uint B = ((color >> 16) & 0xFF);
-			
+
 			R = uint(float(R) * shade);
 			G = uint(float(G) * shade);
 			B = uint(float(B) * shade);

@@ -46,4 +46,3 @@ vector <GLubyte> Texture::getPixels()
 	glGetTextureImage(this->handle, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->width * this->height * 4, buf.data());
 	return buf;
 }
-
