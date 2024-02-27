@@ -6,6 +6,7 @@ from tkinter import SEL
 import numpy as np
 from glumpy import app, gl, gloo, data, transforms
 import glfw
+import glm
 import cv2
 
 try:
@@ -34,6 +35,11 @@ def get_args():
     parser.add_argument('--viewf', type=str, default="C:/UMD/render_pc/data/nasa/hurricane/view_.txt", help='View matrices file path')
     
     parser.add_argument('--viewport', type=str, default='1820,980', help='width,height') # '3200,2000' for server screen
+    parser.add_argument('--fovy', type=float, default=60.0, help='field of view in y direction')
+    parser.add_argument('--fovx', type=float, default=60.0, help='field of view in x direction')
+    parser.add_argument('--near', type=float, default=0.1, help='near plane')
+    parser.add_argument('--far', type=float, default=200000.0, help='far plane')
+
     parser.add_argument('--rmode', choices=['trackball', 'fly'], default='trackball')
     parser.add_argument('--fps', action='store_true', help='show fps')
     parser.add_argument('--replay-camera', type=str, default='', help='path to view_matrix to replay at given fps')
@@ -89,6 +95,16 @@ def fix_viewport_size(viewport_size, factor=16):
     viewport_h = factor * (viewport_size[1] // factor)
     return viewport_w, viewport_h
 
+def compute_proj():
+    # pdb.set_trace()
+    aspect = args.viewport[0] / args.viewport[1]
+    proj = np.array(glm.perspective(np.pi * (args.fovy / 180.0),
+                        aspect,
+                        args.near, 
+                        args.far)).T
+    
+    return proj
+
 
 class MyApp():
     def __init__(self, args):
@@ -121,14 +137,9 @@ class MyApp():
         #      1.00000000e+00]
         # ])
         vmats = np.loadtxt(args.viewf).reshape(-1, 4, 4)
-        init_view = vmats[2061]
+        init_view = vmats[23]
 
-        init_proj = np.array([
-            [0.932642758, 0.0000000000000000, 0.0000000000000000, 0.0000000000000000],
-            [0.0000000000000000, 1.7320508075688774, 0.0000000000000000, 0.0000000000000000],
-            [0.0000000000000000, 0.0000000000000000, -1.0000010000005000, -1.0000000000000000],
-            [0.0000000000000000, 0.0000000000000000, -0.20000010000005000, 0.0000000000000000]
-        ])
+        init_proj = compute_proj()
         # init_view = np.eye(4)
         #self.trackball = Trackball(init_view, self.viewport_size, 1, rotation_mode=args.rmode)
         self.trackball = Trackball(init_view, self.viewport_size, 1, target=[576.91, 886.62, 10.35], rotation_mode=args.rmode)
@@ -145,7 +156,7 @@ class MyApp():
             import pycuda.gl.autoinit  # this may fails in headless mode
         except:
             raise RuntimeError('PyCUDA init failed, cannot use torch buffer')
-        _ = torch.rand((1, 3, 512,512), dtype=torch.float64, device='cuda') # needs init here, otherwise does not work
+        _ = torch.rand((1, 3, 512,512), dtype=torch.float32, device='cuda') # needs init here, otherwise does not work
 
         screen_tex, self.screen_tex_cuda = create_shared_texture(
             np.zeros((self.viewport_size[1], self.viewport_size[0],4), np.float32))
@@ -216,7 +227,6 @@ class MyApp():
         frame = self.compute_loop.getFrmTensor(self.render_view['framebuffer']).to(torch.float32)
         frame = frame.reshape(H, W, 4) / 255.0
         frame[:,:,3] = 1.0
-        # pdb.set_trace()
         # frame = self.compute_loop.outFramePixels
 
         # if len(frame) > 0:
